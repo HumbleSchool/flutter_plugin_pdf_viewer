@@ -33,41 +33,42 @@ class PDFViewer extends StatefulWidget {
 class _PDFViewerState extends State<PDFViewer> {
   bool _isLoading = true;
   int _pageNumber = 1;
-  int _oldPage = 0;
   PDFPage _page;
-  List<PDFPage> _pages = List();
+  // Map used for caching pdf pages
+  Map<int, PDFPage> _pages = {};
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _oldPage = 0;
-    _pageNumber = 1;
-    _isLoading = true;
-    _pages.clear();
-    _loadPage();
+  void initState() {
+    super.initState();
+    // Called in nextTick so that calling `setState` is safe
+    Future.delayed(Duration.zero).then((_) => _loadPage());
   }
 
   @override
   void didUpdateWidget(PDFViewer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _oldPage = 0;
-    _pageNumber = 1;
-    _isLoading = true;
-    _pages.clear();
-    _loadPage();
+    if (oldWidget.document != widget.document) {
+      _pageNumber = 1;
+      _isLoading = false;
+      _page = null;
+      _pages.clear();
+      _loadPage();
+    }
   }
 
   _loadPage() async {
+    if (_pages.containsKey(_pageNumber)) {
+      _page = _pages[_pageNumber];
+      setState(() {});
+      return;
+    }
+
     setState(() => _isLoading = true);
-    if (_oldPage == 0) {
-      _page = await widget.document.get(page: _pageNumber);
-    } else if (_oldPage != _pageNumber) {
-      _oldPage = _pageNumber;
-      _page = await widget.document.get(page: _pageNumber);
-    }
-    if(this.mounted) {
-      setState(() => _isLoading = false);
-    }
+
+    _page = await widget.document.get(page: _pageNumber);
+    _pages[_pageNumber] = _page;
+
+    setState(() => _isLoading = false);
   }
 
   Widget _drawIndicator() {
