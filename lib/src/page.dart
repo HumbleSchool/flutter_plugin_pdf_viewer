@@ -20,12 +20,14 @@ class _PDFPageState extends State<PDFPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     _repaint();
   }
 
   @override
   void didUpdateWidget(PDFPage oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (oldWidget.imgPath != widget.imgPath) {
       _repaint();
     }
@@ -33,10 +35,11 @@ class _PDFPageState extends State<PDFPage> {
 
   _repaint() {
     provider = FileImage(File(widget.imgPath));
-    final resolver = provider.resolve(createLocalImageConfiguration(context));
-    resolver.addListener((imgInfo, alreadyPainted) {
+    final ImageStream resolver =
+        provider.resolve(createLocalImageConfiguration(context));
+    resolver.addListener(ImageStreamListener((imgInfo, alreadyPainted) {
       if (!alreadyPainted) setState(() {});
-    });
+    }));
   }
 
   @override

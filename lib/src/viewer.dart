@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 import 'package:numberpicker/numberpicker.dart';
+
 import 'tooltip.dart';
 
 enum IndicatorPosition { topLeft, topRight, bottomLeft, bottomRight }
@@ -15,17 +16,17 @@ class PDFViewer extends StatefulWidget {
   final bool showNavigation;
   final PDFViewerTooltip tooltip;
 
-  PDFViewer(
-      {Key key,
-      @required this.document,
-      this.indicatorText = Colors.white,
-      this.indicatorBackground = Colors.black54,
-      this.showIndicator = true,
-      this.showPicker = true,
-      this.showNavigation = true,
-      this.tooltip = const PDFViewerTooltip(),
-      this.indicatorPosition = IndicatorPosition.topRight})
-      : super(key: key);
+  PDFViewer({
+    Key key,
+    @required this.document,
+    this.indicatorText = Colors.white,
+    this.indicatorBackground = Colors.black54,
+    this.showIndicator = true,
+    this.showPicker = true,
+    this.showNavigation = true,
+    this.tooltip = const PDFViewerTooltip(),
+    this.indicatorPosition = IndicatorPosition.topRight,
+  }) : super(key: key);
 
   _PDFViewerState createState() => _PDFViewerState();
 }
@@ -34,13 +35,15 @@ class _PDFViewerState extends State<PDFViewer> {
   bool _isLoading = true;
   int _pageNumber = 1;
   PDFPage _page;
-  // Map used for caching pdf pages
+
+  // Map used for caching PDF pages
   Map<int, PDFPage> _pages = {};
 
   @override
   void initState() {
     super.initState();
-    // Called in nextTick so that calling `setState` is safe
+
+    // Call in next tick so that calling [setState] is safe
     Future.delayed(Duration.zero).then((_) => _loadPage());
   }
 
@@ -73,18 +76,23 @@ class _PDFViewerState extends State<PDFViewer> {
 
   Widget _drawIndicator() {
     Widget child = GestureDetector(
-        onTap: _pickPage,
-        child: Container(
-            padding:
-                EdgeInsets.only(top: 4.0, left: 16.0, bottom: 4.0, right: 16.0),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4.0),
-                color: widget.indicatorBackground),
-            child: Text("$_pageNumber/${widget.document.count}",
-                style: TextStyle(
-                    color: widget.indicatorText,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w400))));
+      onTap: _pickPage,
+      child: Container(
+        padding: EdgeInsets.only(top: 4, left: 16, bottom: 4, right: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: widget.indicatorBackground,
+        ),
+        child: Text(
+          '$_pageNumber/${widget.document.count}',
+          style: TextStyle(
+            color: widget.indicatorText,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    );
 
     switch (widget.indicatorPosition) {
       case IndicatorPosition.topLeft:
@@ -132,7 +140,7 @@ class _PDFViewerState extends State<PDFViewer> {
       ),
       floatingActionButton: widget.showPicker
           ? FloatingActionButton(
-              elevation: 4.0,
+              elevation: 4,
               tooltip: widget.tooltip.jump,
               child: Icon(Icons.view_carousel),
               onPressed: () {
